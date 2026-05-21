@@ -7,7 +7,7 @@ const [loginOpen, setLoginOpen] = useState(false)
 const [cartOpen, setCartOpen] = useState(false)
 const [productOpen, setProductOpen] = useState(false)
 const [cartCount, setCartCount] = useState(0)
-const [cartItems, setCartItems] = useState([])
+const [cartItems, setCartItems] = useState<any[]>([])
 const [selectedSize, setSelectedSize] = useState('M')
 const products = [
   { name: 'Signature Merino', price: 89, image: '/product-1.jpg' },
