@@ -1,20 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, Mulish } from "next/font/google";
+
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+import Navbar from "../components/layout/Navbar";
+import Footer from "../components/layout/Footer";
+
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-cormorant",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const mulish = Mulish({
   subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-mulish",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "SOLENNECLUB",
-description: "Luxury fashion journal and collection.",
+  title: "SOLENNECLUB | The Art of Walking Well",
+  description:
+    "A quiet luxury textile brand grounded in comfort, ritual, and silence.",
 };
 
 export default function RootLayout({
@@ -25,9 +34,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${cormorant.variable} ${mulish.variable}`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="bg-brand-cream text-brand-warmBlack antialiased selection:bg-brand-clay selection:text-white">
+        <Navbar />
+
+        <main className="min-h-screen pt-[110px]">
+          {children}
+        </main>
+
+        <Footer />
+      </body>
     </html>
   );
 }
