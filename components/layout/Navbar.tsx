@@ -1,10 +1,44 @@
 "use client";
 
 import Link from "next/link";
+import { useLanguage } from "@/components/language/LanguageProvider";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
+const { language, setLanguage } = useLanguage();
+const [bagCount, setBagCount] = useState(0);
+
+useEffect(() => {
+  const updateBagCount = () => {
+  try {
+    const rawBag = window.localStorage.getItem("solenneclub_bag");
+    const bagItems = rawBag ? JSON.parse(rawBag) : [];
+
+    const count = Array.isArray(bagItems)
+      ? bagItems.reduce(
+          (total, item) => total + Number(item.quantity || 0),
+          0
+        )
+      : 0;
+
+    setBagCount(count);
+  } catch {
+    setBagCount(0);
+  }
+};
+
+  updateBagCount();
+
+  window.addEventListener("storage", updateBagCount);
+  window.addEventListener("solenneclub-bag-updated", updateBagCount);
+
+  return () => {
+    window.removeEventListener("storage", updateBagCount);
+    window.removeEventListener("solenneclub-bag-updated", updateBagCount);
+  };
+}, []);
 
   const navLinks = [
     { name: "SHOP", href: "/shop" },
@@ -65,20 +99,42 @@ export default function Navbar() {
   href="/cart"
   className="absolute left-1/2 -translate-x-1/2 font-sans text-[11px] font-light tracking-[0.28em] text-black/65 transition hover:text-black"
 >
-  BAG (0)
+  BAG ({bagCount})
 </Link>
 
 {/* Right Side */}
-          <div className="flex items-center gap-8">
-            <Link
-              href="/account"
-              className="font-sans text-[11px] font-light tracking-[0.28em] text-black/65 transition hover:text-black"
-            >
-              ACCOUNT
-            </Link>
+<div className="flex items-center gap-8">
+  <div className="flex items-center gap-2 font-sans text-[11px] font-light uppercase tracking-[0.28em]">
+  <button
+    type="button"
+    onClick={() => setLanguage("de")}
+    className={`transition hover:text-black ${
+      language === "de" ? "text-black" : "text-black/35"
+    }`}
+  >
+    DE
+  </button>
 
-            
-          </div>
+  <span className="text-black/25">/</span>
+
+  <button
+    type="button"
+    onClick={() => setLanguage("en")}
+    className={`transition hover:text-black ${
+      language === "en" ? "text-black" : "text-black/35"
+    }`}
+  >
+    EN
+  </button>
+</div>
+
+  <Link
+    href="/account"
+    className="font-sans text-[11px] font-light tracking-[0.28em] text-black/65 transition hover:text-black"
+  >
+    ACCOUNT
+  </Link>
+</div>
 
         </div>
       </header>

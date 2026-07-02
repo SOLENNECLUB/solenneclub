@@ -9,6 +9,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  async redirects() {
+    return [
+      {
+        source: "/services/login_with_shop/:path*",
+        destination:
+          "https://solenneclub.myshopify.com/services/login_with_shop/:path*",
+        permanent: false,
+      },
+    ];
+  },
 };
 
-export default nextConfig;	
+export default nextConfig;

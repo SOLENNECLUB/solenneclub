@@ -1,3 +1,4 @@
+import { LanguageProvider } from "@/components/language/LanguageProvider";
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Mulish } from "next/font/google";
 
@@ -33,18 +34,16 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
-      className={`${cormorant.variable} ${mulish.variable}`}
-    >
-      <body className="bg-brand-cream text-brand-warmBlack antialiased selection:bg-brand-clay selection:text-white">
-        <Navbar />
-
-        <main className="min-h-screen pt-[110px]">
-          {children}
-        </main>
-
-        <Footer />
-      </body>
+  lang="de"
+  className={`${cormorant.variable} ${mulish.variable}`}
+>
+      <body className="bg-[#f8f5ef] text-[#1A1918] antialiased">
+  <LanguageProvider>
+    <Navbar />
+    {children}
+    <Footer />
+  </LanguageProvider>
+</body>
     </html>
   );
 }

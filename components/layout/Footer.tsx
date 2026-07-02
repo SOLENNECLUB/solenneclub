@@ -1,9 +1,16 @@
+"use client";
 import Link from "next/link";
+import { useLanguage } from "@/components/language/LanguageProvider";
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
-    <footer className="mt-20 border-t border-black/10 bg-[#f8f5ef]">
-      <div className="site-shell grid grid-cols-1 gap-12 px-12 pt-20 pb-20 md:grid-cols-4">
+    <footer
+  className="mt-20 border-t border-black/10 bg-[#f8f5ef]"
+  style={{ paddingTop: "30px" }}
+>
+      <div className="site-shell grid grid-cols-1 gap-12 px-12 pb-20 md:grid-cols-4">
         {/* Brand */}
         <div>
           <h3 className="mb-8 font-serif text-[24px] font-light tracking-[0.18em] text-[#1A1918]">
@@ -11,70 +18,76 @@ export default function Footer() {
           </h3>
 
           <p className="max-w-[280px] font-sans text-[13px] font-light leading-7 text-black/60">
-            Est. 2025. A registered trademark dedicated to the quiet art of
-            walking well. Crafted for comfort, designed for life.
+            {t.footer.description}
           </p>
         </div>
 
         {/* Explore */}
         <div>
           <h4 className="mb-7 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-black/40">
-            Explore
+            {t.footer.explore}
           </h4>
 
           <ul className="space-y-3 font-serif text-[20px] font-light leading-7 text-black/75">
             <li>
-              <Link href="/shop">The Sock</Link>
+              <Link href="/shop">{t.footer.theSock}</Link>
             </li>
             <li>
-              <Link href="/journal">Journal</Link>
+              <Link href="/journal">
+  {t.footer.journal}
+</Link>
             </li>
             <li>
-              <Link href="/philosophy">Philosophy</Link>
+              <Link href="/philosophy">
+  {t.footer.philosophy}
+</Link>
             </li>
           </ul>
         </div>
 
         {/* Legal */}
         <div>
-          <h4 className="mb-7 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-black/40">
-            Legal
-          </h4>
-
+          <p className="mb-4 font-sans text-[10px] font-semibold uppercase tracking-[0.42em] text-[#1A1918]/38">
+  {t.footer.legal}
+</p>
           <ul className="space-y-3 font-sans text-[13px] font-light leading-6 text-black/60">
             <li>
-              <Link href="/privacy">Privacy Policy</Link>
+              <Link href="/privacy">
+  {t.footer.privacy}
+</Link>
             </li>
             <li>
-              <Link href="/terms">Terms of Service</Link>
+              <Link href="/terms">
+  {t.footer.terms}
+</Link>
             </li>
             <li className="pt-3">
               © 2025 SOLENNECLUB®
               <br />
-              All rights reserved.
+              {t.footer.rights}
             </li>
             <li className="pt-2 text-[12px] italic">
-              SOLENNECLUB® is a registered trademark.
-            </li>
+  {t.footer.trademark}
+</li>
           </ul>
         </div>
 
         {/* Stay in touch */}
         <div>
           <h4 className="mb-7 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-black/40">
-            Stay in Touch
+            {t.footer.stayInTouch}
           </h4>
 
           <p className="mb-6 max-w-[260px] font-sans text-[13px] font-light leading-6 text-black/60">
-            Thoughtful notes on living well.
+            {t.footer.newsletterText}
             <br />
-            No noise. Only meaning.
+            {t.footer.newsletterSub}
           </p>
 
           <div className="flex h-[42px] max-w-[320px] items-center border border-black/15">
             <input
               type="email"
-              placeholder="Your email address"
+              placeholder={t.footer.emailPlaceholder}
               className="h-full flex-1 bg-transparent px-4 font-sans text-[12px] font-light text-black/70 outline-none placeholder:text-black/35"
             />
 
@@ -88,18 +101,40 @@ export default function Footer() {
 
           <div className="mt-7 flex items-center gap-5">
             <Link
-              href="https://instagram.com"
-              className="flex h-8 w-8 items-center justify-center border border-black/20 font-sans text-[10px] font-semibold uppercase tracking-[0.08em] text-black/60 transition hover:bg-black hover:text-white"
-            >
-              IG
-            </Link>
+  href="https://www.instagram.com/solenneclub?igsh=YXgwOG9pb2tkbmtr&utm_source=qr"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="SOLENNECLUB Instagram"
+  className="flex h-8 w-8 items-center justify-center border border-black/20 text-black/60 transition hover:bg-black hover:text-white"
+>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-[15px] w-[15px]"
+    aria-hidden="true"
+  >
+    <rect
+      x="3"
+      y="3"
+      width="18"
+      height="18"
+      rx="5"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    />
+    <circle
+      cx="12"
+      cy="12"
+      r="4"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    />
+    <circle cx="17.4" cy="6.7" r="1" fill="currentColor" />
+  </svg>
+</Link>
 
-            <Link
-              href="https://pinterest.com"
-              className="flex h-8 w-8 items-center justify-center border border-black/20 font-sans text-[10px] font-semibold uppercase tracking-[0.08em] text-black/60 transition hover:bg-black hover:text-white"
-            >
-              PI
-            </Link>
+            
 
             <Link
               href="mailto:hello@solenneclub.com"

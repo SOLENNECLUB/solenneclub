@@ -1,752 +1,567 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { useLanguage } from "@/components/language/LanguageProvider";
 
-const productFacts = ["DESIGNED IN GERMANY", "MADE IN ITALY"];
-
-const productImages = {
-  hero: "/product-1.jpg",
-  firstObject: "/first-object.png",
-  releaseObject: "/release-object.png",
-  finalProduct: "/final-product.jpg",
-  ivory: "/product-2.jpg",
-  detail: "/product-3.jpg",
-  brown: "/product-4.jpg",
+type Tone = {
+  name: string;
+  hex: string;
 };
-const finalGalleryImages = [
+
+type Product = {
+  code: string;
+  name: string;
+  price: string;
+  material: string;
+  origin: string;
+  status: string;
+  description: string;
+  tones: Tone[];
+  sizes: string[];
+  defaultTone: string;
+  defaultSize: string;
+  images?: string[];
+};
+
+type BagItem = {
+  id: string;
+  name: string;
+  code: string;
+  color: string;
+  size: string;
+  material: string;
+  origin: string;
+  price: number;
+  quantity: number;
+  image?: string;
+};
+
+const products: Product[] = [
   {
-    src: "/final-product.jpg",
-    label: "01",
+    code: "SC / OBJ / 001",
+    name: "The Sock",
+    price: "€88",
+    material: "Cotton / Cashmere / Silk",
+    origin: "Germany / Italy",
+    status: "Limited release",
+    description:
+      "A quiet everyday object shaped around softness, rhythm, and daily use.",
+    tones: [
+      { name: "Oat Milk", hex: "#E6E4E0" },
+      { name: "Cream", hex: "#F1ECE3" },
+      { name: "Black", hex: "#1A1918" },
+      { name: "Earth Brown", hex: "#8A7966" },
+    ],
+    sizes: ["36–40", "41–43", "44–46"],
+    defaultTone: "Oat Milk",
+    defaultSize: "41–43",
+    images: [
+      "/the-sock-reference.png",
+      "/final-gallery-2.jpg",
+      "/final-gallery-3.jpg",
+      "/final-product.jpg",
+    ],
   },
   {
-    src: "/final-gallery-2.jpg",
-    label: "02",
+    code: "SC / OBJ / 002",
+    name: "The Sock — Cream",
+    price: "€88",
+    material: "Cotton / Cashmere / Silk",
+    origin: "Germany / Italy",
+    status: "Coming soon",
+    description: "A softer light tone for quiet dressing and calm daily wear.",
+    tones: [
+      { name: "Cream", hex: "#F1ECE3" },
+      { name: "Oat Milk", hex: "#E6E4E0" },
+      { name: "Black", hex: "#1A1918" },
+    ],
+    sizes: ["36–40", "41–43", "44–46"],
+    defaultTone: "Cream",
+    defaultSize: "41–43",
   },
   {
-    src: "/final-gallery-3.jpg",
-    label: "03",
+    code: "SC / OBJ / 003",
+    name: "The Sock — Black",
+    price: "€88",
+    material: "Cotton / Cashmere / Silk",
+    origin: "Germany / Italy",
+    status: "Coming soon",
+    description:
+      "A darker object with a calm presence and a more graphic attitude.",
+    tones: [
+      { name: "Black", hex: "#1A1918" },
+      { name: "Oat Milk", hex: "#E6E4E0" },
+      { name: "Stone", hex: "#D4CEC4" },
+    ],
+    sizes: ["36–40", "41–43", "44–46"],
+    defaultTone: "Black",
+    defaultSize: "41–43",
+  },
+  {
+    code: "SC / OBJ / 004",
+    name: "The Sock — Brown",
+    price: "€88",
+    material: "Cotton / Cashmere / Silk",
+    origin: "Germany / Italy",
+    status: "Coming soon",
+    description:
+      "A warm neutral tone designed for softer combinations and quiet contrast.",
+    tones: [
+      { name: "Earth Brown", hex: "#8A7966" },
+      { name: "Oat Milk", hex: "#E6E4E0" },
+      { name: "Black", hex: "#1A1918" },
+    ],
+    sizes: ["36–40", "41–43", "44–46"],
+    defaultTone: "Earth Brown",
+    defaultSize: "41–43",
+  },
+  {
+    code: "SC / SET / 001",
+    name: "The First Set",
+    price: "€240",
+    material: "Cotton / Cashmere / Silk",
+    origin: "Germany / Italy",
+    status: "Limited release",
+    description: "A considered first set for the beginning of the collection.",
+    tones: [
+      { name: "Oat Milk", hex: "#E6E4E0" },
+      { name: "Cream", hex: "#F1ECE3" },
+      { name: "Black", hex: "#1A1918" },
+      { name: "Earth Brown", hex: "#8A7966" },
+    ],
+    sizes: ["36–40", "41–43", "44–46"],
+    defaultTone: "Oat Milk",
+    defaultSize: "41–43",
+  },
+  {
+    code: "SC / OBJ / 005",
+    name: "The Ribbed Sock",
+    price: "€92",
+    material: "Natural fibre blend",
+    origin: "Germany / Italy",
+    status: "In development",
+    description:
+      "A slightly more structured object with a richer visual texture.",
+    tones: [
+      { name: "Stone", hex: "#D4CEC4" },
+      { name: "Cream", hex: "#F1ECE3" },
+      { name: "Black", hex: "#1A1918" },
+    ],
+    sizes: ["36–40", "41–43", "44–46"],
+    defaultTone: "Stone",
+    defaultSize: "41–43",
   },
 ];
-const scrollScenes = [
-  {
-    type: "logo",
-    eyebrow: "",
-    title: "SOLENNECLUB",
-    italic: "",
-    text: "THE SOCK / 001",
-    image: null,
-    imageSide: "none",
-  },
-  {
-  type: "firstObject",
-  eyebrow: "",
-  title: "The First",
-  italic: "Object.",
-  text: "Not made to be noticed. Made to be felt, repeated, and carried through the day.",
-  image: productImages.firstObject,
-  imageSide: "left",
-},
-{
-  type: "center",
-  eyebrow: "The Feel",
-  title: "Cotton breathes.",
-  italic: "Cashmere warms. Silk softens.",
-  text: "A balanced composition made to move with the body, stay gentle against the skin, and elevate the everyday.",
-  image: null,
-  imageSide: "none",
-},
-  {
-  type: "center",
-  eyebrow: "Against the skin",
-  title: "The first contact",
-  italic: "matters.",
-  text: "A sock is the first layer between the body and the day. It should not interrupt. It should begin softly.",
-  image: null,
-  imageSide: "none",
-},
-  
-  {
-  type: "releaseObject",
-  eyebrow: "Release",
-  title: "Limited",
-  italic: "by intention.",
-  text: "The first object is not released endlessly. It arrives slowly, carefully, and in limited numbers.",
-  image: productImages.releaseObject,
-  imageSide: "right",
-},
-  {
-    type: "buy",
-    eyebrow: "SOLENNECLUB",
-    title: "The Sock",
-    italic: "",
-    text: "A quiet object, before it becomes yours.",
-    image: productImages.finalProduct,
-    imageSide: "left",
-  },
-];
 
-function clamp(value: number) {
-  return Math.min(1, Math.max(0, value));
-}
+function ProductCard({ product }: { product: Product }) {
+  const [selectedTone, setSelectedTone] = useState(product.defaultTone);
+  const [selectedSize, setSelectedSize] = useState(product.defaultSize);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+const { t } = useLanguage();
 
-function mapRange(value: number, inMin: number, inMax: number) {
-  return clamp((value - inMin) / (inMax - inMin));
-}
-function smoothStep(value: number) {
-  return value * value * (3 - 2 * value);
-}
+const productCopy = (() => {
+  if (product.code === "SC / OBJ / 001") return t.shop.products.sock;
+  if (product.code === "SC / OBJ / 002") return t.shop.products.cream;
+  if (product.code === "SC / OBJ / 003") return t.shop.products.black;
+  if (product.code === "SC / OBJ / 004") return t.shop.products.brown;
+  if (product.code === "SC / SET / 001") return t.shop.products.firstSet;
+  return t.shop.products.ribbed;
+})();
 
-function sceneOpacity(progress: number, index: number, total: number) {
-  const start = index / total;
-  const end = (index + 1) / total;
-  const fade = 0.18;
+const translatedStatus = (() => {
+  const status = product.status.toLowerCase();
 
-  const fadeIn =
-    index === 0 ? 1 : smoothStep(mapRange(progress, start, start + fade));
+  if (status.includes("limited")) return t.shop.limitedRelease;
+  if (status.includes("development")) return t.shop.inDevelopment;
+  return t.shop.comingSoon;
+})();
 
-  const fadeOut =
-    index === total - 1
-      ? 1
-      : 1 - smoothStep(mapRange(progress, end - fade, end));
+  const gallery = product.images ?? [];
+  const activeImage = gallery[activeImageIndex];
 
-  return Math.min(fadeIn, fadeOut);
-}
+  const activeTone =
+    product.tones.find((tone) => tone.name === selectedTone) ||
+    product.tones[0];
 
-function sceneProgress(progress: number, index: number, total: number) {
-  const start = index / total;
-  const end = (index + 1) / total;
+  const isDark = activeTone.hex.toLowerCase() === "#1a1918";
 
-  return mapRange(progress, start, end);
+  const visualBackground = isDark
+    ? "radial-gradient(circle at 50% 62%, rgba(210,204,194,0.20) 0%, rgba(120,112,103,0.16) 30%, rgba(26,25,24,0) 58%), linear-gradient(145deg, #171615 0%, #2A2722 58%, #1A1918 100%)"
+    : `radial-gradient(circle at 50% 58%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.45) 34%, rgba(255,255,255,0) 62%), linear-gradient(145deg, ${activeTone.hex} 0%, #F9F8F6 100%)`;
+
+  const sockColor = isDark ? "#77716A" : "#F8F6F2";
+
+  const overlayBg = isDark
+    ? "rgba(216, 211, 203, 0.55)"
+    : "rgba(249, 248, 246, 0.74)";
+
+  const overlayBorder = isDark
+    ? "rgba(249, 248, 246, 0.18)"
+    : "rgba(26, 25, 24, 0.13)";
+
+  function decreaseQuantity() {
+    setQuantity((current) => Math.max(1, current - 1));
+  }
+
+  function increaseQuantity() {
+    setQuantity((current) => current + 1);
+  }
+
+  function showPrevImage() {
+    if (!gallery.length) return;
+
+    setActiveImageIndex((current) =>
+      current === 0 ? gallery.length - 1 : current - 1
+    );
+  }
+
+  function showNextImage() {
+    if (!gallery.length) return;
+
+    setActiveImageIndex((current) =>
+      current === gallery.length - 1 ? 0 : current + 1
+    );
+  }
+
+  function addToBag() {
+    const itemId = `${product.code}-${selectedTone}-${selectedSize}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-");
+
+    let currentBag: BagItem[] = [];
+
+    try {
+      const rawBag = window.localStorage.getItem("solenneclub_bag");
+      const parsedBag = rawBag ? JSON.parse(rawBag) : [];
+      currentBag = Array.isArray(parsedBag) ? parsedBag : [];
+    } catch {
+      currentBag = [];
+    }
+
+    const newItem: BagItem = {
+      id: itemId,
+      name: productCopy.name,
+      code: product.code,
+      color: selectedTone,
+      size: selectedSize,
+      material: product.material,
+      origin: product.origin,
+      price: Number(product.price.replace(/[^\d.]/g, "")),
+      quantity,
+      image: product.images?.[0],
+    };
+
+    const existingItemIndex = currentBag.findIndex(
+      (item) => item.id === itemId
+    );
+
+    if (existingItemIndex >= 0) {
+      currentBag[existingItemIndex].quantity += quantity;
+    } else {
+      currentBag.push(newItem);
+    }
+
+    const nextBagCount = currentBag.reduce(
+      (total, item) => total + item.quantity,
+      0
+    );
+
+    window.localStorage.setItem("solenneclub_bag", JSON.stringify(currentBag));
+    window.localStorage.setItem("solenneclub_bag_count", String(nextBagCount));
+    window.dispatchEvent(new Event("solenneclub-bag-updated"));
+
+    setQuantity(1);
+  }
+
+  return (
+    <article className="group">
+      <div
+        className="relative aspect-[4/5.65] overflow-hidden border border-[#1A1918]/10 transition duration-500 group-hover:shadow-[0_28px_80px_rgba(26,25,24,0.08)]"
+        style={{ background: visualBackground }}
+      >
+        {/* TOP META */}
+        <div
+          className={`absolute left-5 top-5 z-30 font-sans text-[9px] font-light uppercase tracking-[0.32em] ${
+            isDark ? "text-[#F9F8F6]/38" : "text-[#1A1918]/38"
+          }`}
+        >
+          {product.code}
+        </div>
+
+        <div
+          className={`absolute right-5 top-5 z-30 font-sans text-[9px] font-light uppercase tracking-[0.32em] ${
+            isDark ? "text-[#F9F8F6]/38" : "text-[#1A1918]/38"
+          }`}
+        >
+          {translatedStatus}
+        </div>
+
+        {/* PRODUCT VISUAL */}
+        <div className="absolute inset-0">
+          {activeImage ? (
+            <div className="absolute inset-x-8 top-14 bottom-[255px] transition duration-700 group-hover:scale-[1.015]">
+              <Image
+                src={activeImage}
+                alt={productCopy.name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                className="object-contain"
+                priority={product.code === "SC / OBJ / 001"}
+              />
+            </div>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center pb-[230px]">
+              {isDark && (
+                <div className="absolute h-[44%] w-[54%] rounded-full bg-[#F9F8F6]/12 blur-3xl" />
+              )}
+
+              <div
+                className="relative h-[53%] w-[34%] rounded-t-[999px] border border-[#1A1918]/10 shadow-[0_24px_90px_rgba(26,25,24,0.14)] transition duration-700 group-hover:scale-[1.03]"
+                style={{ backgroundColor: sockColor }}
+              />
+            </div>
+          )}
+
+          <div className="absolute inset-x-0 bottom-0 h-[44%] bg-gradient-to-t from-[#F9F8F6]/62 via-[#F9F8F6]/18 to-transparent" />
+        </div>
+
+        {/* GALLERY CONTROLS */}
+        {gallery.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={showPrevImage}
+              className="absolute left-5 top-[41%] z-40 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#F9F8F6]/45 bg-[#F9F8F6]/20 font-sans text-[17px] font-light text-[#F9F8F6] backdrop-blur-md transition duration-300 hover:bg-[#F9F8F6]/38"
+              aria-label="Previous image"
+            >
+              ‹
+            </button>
+
+            <button
+              type="button"
+              onClick={showNextImage}
+              className="absolute right-5 top-[41%] z-40 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#F9F8F6]/45 bg-[#F9F8F6]/20 font-sans text-[17px] font-light text-[#F9F8F6] backdrop-blur-md transition duration-300 hover:bg-[#F9F8F6]/38"
+              aria-label="Next image"
+            >
+              ›
+            </button>
+
+            <div className="absolute left-1/2 top-12 z-40 flex -translate-x-1/2 items-center gap-2">
+              {gallery.map((_, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setActiveImageIndex(index)}
+                  className={`h-[2px] transition duration-300 ${
+                    activeImageIndex === index
+                      ? "w-8 bg-[#F9F8F6]/80"
+                      : "w-4 bg-[#F9F8F6]/35"
+                  }`}
+                  aria-label={`Show image ${index + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* GLASS INFO PANEL */}
+        <div className="absolute inset-x-5 bottom-5 z-30">
+          <div
+            className="border px-4 pb-4 pt-4 backdrop-blur-xl"
+            style={{
+              background: overlayBg,
+              borderColor: overlayBorder,
+            }}
+          >
+            {/* TITLE */}
+            <div className="flex items-start justify-between gap-5">
+              <div>
+                <h2 className="font-serif text-[22px] font-light leading-none tracking-[-0.035em] text-[#1A1918]">
+                  {productCopy.name}
+                </h2>
+
+                <p className="mt-2 max-w-[390px] font-sans text-[11px] font-light leading-5 text-[#1A1918]/58">
+                  {productCopy.description}
+                </p>
+              </div>
+
+              <p className="pt-1 font-sans text-[11px] font-light tracking-[0.12em] text-[#1A1918]/64">
+                {product.price}
+              </p>
+            </div>
+
+            {/* TONE */}
+            <div className="mt-4 border-t border-[#1A1918]/10 pt-3">
+              <p className="mb-2 font-sans text-[8px] font-light uppercase tracking-[0.28em] text-[#1A1918]/42">
+                {t.shop.selectTone}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-2">
+                {product.tones.map((tone) => {
+                  const active = selectedTone === tone.name;
+
+                  return (
+                    <button
+                      key={tone.name}
+                      type="button"
+                      onClick={() => setSelectedTone(tone.name)}
+                      aria-label={tone.name}
+                      className={`flex items-center gap-2 border px-2.5 py-1.5 transition duration-300 ${
+                        active
+                          ? "border-[#1A1918]/60 bg-[#F9F8F6]/55"
+                          : "border-[#1A1918]/12 bg-transparent hover:border-[#1A1918]/32"
+                      }`}
+                    >
+                      <span
+                        className="block h-3.5 w-3.5 rounded-full border border-[#1A1918]/18"
+                        style={{ backgroundColor: tone.hex }}
+                      />
+
+                      <span className="font-sans text-[8px] font-light uppercase tracking-[0.2em] text-[#1A1918]/62">
+                        {tone.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* SIZE */}
+            <div className="mt-4">
+              <p className="mb-2 font-sans text-[8px] font-light uppercase tracking-[0.28em] text-[#1A1918]/42">
+                {t.shop.selectSize}
+              </p>
+
+              <div className="grid grid-cols-3 gap-2">
+                {product.sizes.map((size) => {
+                  const active = selectedSize === size;
+
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => setSelectedSize(size)}
+                      className={`h-10 border font-sans text-[10px] font-light tracking-[0.16em] transition duration-300 ${
+                        active
+                          ? "border-[#1A1918] bg-[#1A1918] text-[#F9F8F6]"
+                          : "border-[#1A1918]/12 bg-[#F9F8F6]/20 text-[#1A1918]/62 hover:border-[#1A1918]/30"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="mt-4 grid grid-cols-[112px_1fr] gap-2 border-t border-[#1A1918]/10 pt-3">
+              <div className="grid grid-cols-3 border border-[#1A1918]/14 bg-[#F9F8F6]/35">
+                <button
+                  type="button"
+                  onClick={decreaseQuantity}
+                  className="h-11 font-sans text-[13px] font-light text-[#1A1918]/58 transition duration-300 hover:bg-[#1A1918] hover:text-[#F9F8F6]"
+                  aria-label="Decrease quantity"
+                >
+                  −
+                </button>
+
+                <div className="flex h-11 items-center justify-center border-x border-[#1A1918]/12 font-sans text-[10px] font-light tracking-[0.18em] text-[#1A1918]/62">
+                  {quantity}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={increaseQuantity}
+                  className="h-11 font-sans text-[13px] font-light text-[#1A1918]/58 transition duration-300 hover:bg-[#1A1918] hover:text-[#F9F8F6]"
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={addToBag}
+                className="group/cta flex h-11 items-center justify-between border border-[#1A1918]/45 bg-[#F9F8F6]/50 px-4 font-sans text-[9px] font-light uppercase tracking-[0.3em] text-[#1A1918]/78 transition duration-300 hover:bg-[#1A1918] hover:text-[#F9F8F6]"
+              >
+                <span>{t.shop.addToBag}</span>
+                <span className="transition duration-300 group-hover/cta:translate-x-1">
+                  →
+                </span>
+              </button>
+            </div>
+
+            {/* META */}
+            <div className="mt-4 grid grid-cols-2 gap-4 border-t border-[#1A1918]/10 pt-3">
+              <div>
+                <p className="mb-1 font-sans text-[8px] font-light uppercase tracking-[0.24em] text-[#1A1918]/38">
+                  {t.shop.material}
+                </p>
+
+                <p className="font-sans text-[9px] font-light uppercase tracking-[0.16em] text-[#1A1918]/58">
+                  {product.material}
+                </p>
+              </div>
+
+              <div>
+                <p className="mb-1 font-sans text-[8px] font-light uppercase tracking-[0.24em] text-[#1A1918]/38">
+  {t.shop.origin}
+</p>
+
+                <p className="font-sans text-[9px] font-light uppercase tracking-[0.16em] text-[#1A1918]/58">
+                  {product.origin}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
 }
 
 export default function ShopPage() {
-  const theaterRef = useRef<HTMLElement | null>(null);
-const productGalleryRef = useRef<HTMLDivElement | null>(null);
-
-const [progress, setProgress] = useState(0);
-const [activeProductImage, setActiveProductImage] = useState(0);
-
-const goToProductImage = (imageIndex: number) => {
-  setActiveProductImage(imageIndex);
-
-  productGalleryRef.current?.scrollTo({
-    left: productGalleryRef.current.clientWidth * imageIndex,
-    behavior: "smooth",
-  });
-};
-
-  useEffect(() => {
-    let frame = 0;
-
-    const updateProgress = () => {
-      const element = theaterRef.current;
-      if (!element) return;
-
-      const rect = element.getBoundingClientRect();
-      const scrollable = rect.height - window.innerHeight;
-      const current = -rect.top;
-      const nextProgress = scrollable > 0 ? current / scrollable : 0;
-
-      setProgress(clamp(nextProgress));
-
-      const immersiveActive =
-        rect.top <= 0 && rect.bottom >= window.innerHeight * 0.45;
-
-      document.body.classList.toggle(
-        "solenne-immersive-active",
-        immersiveActive
-      );
-    };
-
-    const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(updateProgress);
-    };
-
-    updateProgress();
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", updateProgress);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", updateProgress);
-      document.body.classList.remove("solenne-immersive-active");
-    };
-  }, []);
+  const { t } = useLanguage();
 
   return (
-    <main className="site-shell bg-[#F9F8F6] shadow-2xl">
-      {/* 01 — WHITE ENTRY */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center px-8 pt-[130px] text-center">
-        <p className="mb-8 font-sans text-[10px] font-light uppercase tracking-[0.42em] text-black/35">
-          The Collection
-        </p>
+    <main className="min-h-screen bg-[#F9F8F6] text-[#1A1918]">
+      <section className="px-6 pb-24 md:px-10 lg:px-16">
+        <div className="mx-auto max-w-[1500px]">
+          {/* HEADER */}
+          <div
+            className="mb-12 border-b border-[#1A1918]/10 pb-10 text-center"
+            style={{ paddingTop: "140px" }}
+          >
+            <p className="mb-5 font-sans text-[10px] font-light uppercase tracking-[0.42em] text-[#1A1918]/38">
+              {t.shop.collection}
+            </p>
 
-        <h1 className="mx-auto max-w-[780px] font-serif text-[48px] font-light leading-[1.02] tracking-[-0.05em] text-[#1A1918] md:text-[82px]">
-          One object.
-          <br />
-          <span className="italic">Many moments.</span>
-        </h1>
-
-        <div
-  className="absolute left-1/2 grid -translate-x-1/2 grid-cols-2 border-y border-black/10 py-4"
-  style={{
-    bottom: "30vh",
-    width: "min(760px, calc(100vw - 56px))",
-  }}
->
-  {productFacts.map((fact) => (
-    <div key={fact} className="text-center">
-      <p className="font-sans text-[12px] font-light uppercase tracking-[0.34em] text-black/64">
-        {fact}
-      </p>
-    </div>
-  ))}
-</div>
-
-        <div className="scrollChevron">
-  <span />
-  <span />
-  <span />
-</div>
-      </section>
-
-      {/* KLARNA-LIKE PRODUCT EXPERIENCE */}
-      <section
-        ref={theaterRef}
-        className="relative left-1/2 h-[920vh] w-screen -translate-x-1/2 bg-[#343229] text-[#F9F8F6]"
-      >
-        <div className="sticky top-0 h-screen overflow-hidden bg-[#343229]">
-          {/* base atmosphere */}
-          <Image
-            src={productImages.hero}
-            alt="SOLENNECLUB The Sock"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-            style={{
-              opacity: 0.12 + progress * 0.1,
-              transform: `scale(${1.08 - progress * 0.04})`,
-            }}
-          />
-
-          <div className="absolute inset-0 bg-[#343229]/68" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#343229]/78 via-[#343229]/26 to-[#343229]/78" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.055),transparent_38%)]" />
-
-          {scrollScenes.map((scene, index) => {
-            const opacity = sceneOpacity(progress, index, scrollScenes.length);
-            const local = sceneProgress(progress, index, scrollScenes.length);
-
-            if (scene.type === "logo") {
-              return (
-                <div
-                  key={`scene-${index}`}
-                  className="absolute inset-0 flex items-center justify-center px-8 text-center"
-                  style={{
-                    opacity,
-                    transform: `scale(${0.92 + local * 0.18})`,
-                    pointerEvents: opacity > 0.2 ? "auto" : "none",
-                  }}
-                >
-                  <div>
-                    <h2 className="font-serif text-[54px] font-light tracking-[0.08em] text-white/82 md:text-[128px] lg:text-[178px]">
-                      SOLENNECLUB
-                    </h2>
-
-                    <p className="mt-8 font-sans text-[10px] font-light uppercase tracking-[0.42em] text-white/42">
-                      THE SOCK / 001
-                    </p>
-                  </div>
-                </div>
-              );
-            }
-if (scene.type === "firstObject") {
-  const firstTitleOpacity = 1 - mapRange(local, 0.18, 0.32);
-const secondTitleOpacity = mapRange(local, 0.38, 0.56);
-
-  return (
-    <div
-      key={`scene-${index}`}
-      className="absolute inset-0 flex items-center justify-center px-8"
-      style={{
-        opacity,
-        transform: `translateY(${20 - local * 40}px)`,
-        pointerEvents: opacity > 0.2 ? "auto" : "none",
-      }}
-    >
-      <div className="flex w-full max-w-[1120px] flex-col items-center">
-        <div className="grid w-full items-center gap-12 md:grid-cols-2 md:gap-16">
-          <div className="flex justify-center">
-            <div className="relative h-[500px] w-full max-w-[560px] bg-transparent">
-              {scene.image && (
-                <Image
-                  src={scene.image}
-                  alt="The Sock"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 560px"
-                  className="object-contain"
-                  style={{
-                    transform: "scale(1.06)",
-                  }}
-                />
-              )}
-            </div>
-          </div>
-
-          <div className="flex justify-center">
-            <div className="relative h-[340px] w-full max-w-[680px]">
-              <h2
-  className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center font-serif text-[72px] font-light leading-[1] tracking-[-0.025em] text-white/95 md:text-[108px] lg:text-[136px]"
-  style={{
-    opacity: firstTitleOpacity,
-  }}
->
-  <span className="block whitespace-nowrap">The First</span>
-  <span className="block whitespace-nowrap italic">Object.</span>
-</h2>
-
-              <h2
-  className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-center font-serif text-[56px] font-light leading-[1.06] tracking-[-0.018em] text-white/95 md:text-[84px] lg:text-[106px]"
-  style={{
-    opacity: secondTitleOpacity,
-  }}
->
-  <span className="block whitespace-nowrap">The quiet art</span>
-  <span className="block whitespace-nowrap italic">of walking well.</span>
-</h2>
-            </div>
-          </div>
-        </div>
-
-        <p className="mt-12 max-w-[860px] text-center font-sans text-[15px] font-light leading-8 text-white/76 md:text-[16px]">
-          Not made to be noticed. Made to be felt, repeated, and carried through
-          the day.
-        </p>
-      </div>
-    </div>
-  );
-}
-            if (scene.type === "center") {
-  const isFeelScene = scene.eyebrow === "The Feel";
-
-  return (
-    <div
-      key={`scene-${index}`}
-      className="absolute inset-0 flex items-center justify-center px-8 text-center"
-      style={{
-        opacity,
-        pointerEvents: opacity > 0.2 ? "auto" : "none",
-      }}
-    >
-      <div className="mx-auto flex max-w-[1040px] flex-col items-center">
-        {scene.eyebrow && (
-          <p className="mb-10 font-sans text-[10px] font-light uppercase tracking-[0.45em] text-white/42">
-            {scene.eyebrow}
-          </p>
-        )}
-
-        {isFeelScene ? (
-          <h2 className="flex flex-col items-center gap-2 font-serif text-[46px] font-light leading-[1.02] tracking-[-0.035em] text-white/92 md:text-[74px] lg:text-[96px]">
-            <span className="block whitespace-nowrap">Cotton breathes.</span>
-            <span className="block whitespace-nowrap italic">
-              Cashmere warms.
-            </span>
-            <span className="block whitespace-nowrap italic">
-              Silk softens.
-            </span>
-          </h2>
-        ) : (
-          <h2 className="flex flex-col items-center gap-3 font-serif text-[50px] font-light leading-[1] tracking-[-0.035em] text-white/92 md:text-[82px] lg:text-[108px]">
-            <span className="block whitespace-nowrap">{scene.title}</span>
-            {scene.italic && (
-              <span className="block whitespace-nowrap italic">
-                {scene.italic}
+            <h1 className="mx-auto w-full overflow-visible whitespace-nowrap font-serif text-[clamp(36px,5.4vw,78px)] font-light leading-[1.25] tracking-[-0.04em] text-[#1A1918]">
+              {t.shop.collectionTitleOne}{" "}
+              <span className="italic text-[#1A1918]/55">
+                {t.shop.collectionTitleTwo}
               </span>
-            )}
-          </h2>
-        )}
+            </h1>
 
-        <p className="mt-10 max-w-[700px] text-center font-sans text-[14px] font-light leading-8 text-white/62 md:text-[15px]">
-          {scene.text}
-        </p>
-      </div>
-    </div>
-  );
-}
-if (scene.type === "releaseObject") {
-  return (
-    <div
-      key={`scene-${index}`}
-      className="absolute inset-0 flex items-center justify-center px-8"
-      style={{
-  opacity,
-  transform: `translateY(${18 - local * 36}px)`,
-  pointerEvents: opacity > 0.2 ? "auto" : "none",
-}}
-    >
-      <div className="grid w-full max-w-[1080px] items-center gap-8 md:grid-cols-[0.95fr_1.05fr] md:gap-10">
-        <div className="flex justify-center">
-          <div className="flex w-full max-w-[520px] flex-col items-center text-center">
-            <p className="mb-7 font-sans text-[10px] font-light uppercase tracking-[0.45em] text-white/42">
-              {scene.eyebrow}
-            </p>
-
-            <h2 className="flex flex-col items-center gap-0 font-serif text-[64px] font-light leading-[0.92] tracking-[-0.024em] text-white/95 md:text-[98px] lg:text-[126px]">
-              <span className="block whitespace-nowrap">{scene.title}</span>
-              {scene.italic && (
-                <span className="block whitespace-nowrap italic">
-                  {scene.italic}
-                </span>
-              )}
-            </h2>
-
-            <p className="mt-8 max-w-[470px] text-center font-sans text-[14px] font-light leading-8 text-white/76 md:text-[15px]">
-              {scene.text}
+            <p className="mx-auto mt-5 w-full whitespace-nowrap text-center font-sans text-[14px] font-light leading-8 text-[#1A1918]/58">
+              {t.shop.collectionIntro}
             </p>
           </div>
-        </div>
 
-        <div className="flex justify-center">
-          <div className="relative h-[560px] w-full max-w-[500px] bg-transparent">
-            {scene.image && (
-              <Image
-                src={scene.image}
-                alt="The Sock"
-                fill
-                sizes="(max-width: 768px) 100vw, 500px"
-                className="object-contain"
-                style={{
-                  transform: "translateY(4px) scale(1.08)",
-                }}
-              />
-            )}
+          {/* PRODUCTS */}
+          <div
+            className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3"
+            style={{ marginTop: "30px" }}
+          >
+            {products.map((product) => (
+              <ProductCard key={product.code} product={product} />
+            ))}
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-            if (scene.type === "buy") {
-  return (
-    <div
-      key={`scene-${index}`}
-      className="absolute inset-0 flex items-center justify-center px-8"
-      style={{
-        opacity,
-        transform: `translateY(${18 - local * 36}px)`,
-        pointerEvents: opacity > 0.2 ? "auto" : "none",
-      }}
-    >
-      <div
-        id="reserve"
-        className="grid w-full max-w-[1180px] overflow-hidden border border-white/10 bg-[#1A1918]/72 md:grid-cols-[0.95fr_1.05fr]"
-      >
-        <div className="relative min-h-[68vh] overflow-hidden bg-black">
-  <div
-    ref={productGalleryRef}
-    className="productGallery absolute inset-0 flex snap-x snap-mandatory overflow-x-auto scroll-smooth"
-    onScroll={(event) => {
-      const current = event.currentTarget;
-      const nextIndex = Math.round(current.scrollLeft / current.clientWidth);
-
-      if (nextIndex !== activeProductImage) {
-        setActiveProductImage(nextIndex);
-      }
-    }}
-  >
-    {finalGalleryImages.map((image) => (
-      <div key={image.label} className="relative h-full min-w-full snap-center">
-        <Image
-          src={image.src}
-          alt={`The Sock ${image.label}`}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover opacity-90"
-        />
-      </div>
-    ))}
-  </div>
-
-  <div className="pointer-events-none absolute inset-0 bg-black/10" />
-
-  <p className="absolute bottom-8 left-8 font-sans text-[10px] font-light uppercase tracking-[0.4em] text-white/40">
-    SC / THE SOCK / 00{activeProductImage + 1}
-  </p>
-
-  <div className="absolute bottom-8 right-8 flex items-center gap-3">
-    {finalGalleryImages.map((image, imageIndex) => (
-      <button
-        key={image.label}
-        type="button"
-        onClick={() => goToProductImage(imageIndex)}
-        className={`h-[6px] w-[34px] transition duration-300 ${
-          activeProductImage === imageIndex
-            ? "bg-white/70"
-            : "bg-white/22 hover:bg-white/42"
-        }`}
-        aria-label={`Show product image ${image.label}`}
-      />
-    ))}
-  </div>
-</div>
-
-        <div className="flex min-h-[68vh] items-center justify-center px-8 py-12 md:px-14 lg:px-16">
-          <div className="w-full max-w-[600px]">
-            <div className="mb-8 flex flex-col items-center text-center">
-  <p className="mb-5 font-sans text-[10px] font-light uppercase tracking-[0.42em] text-white/42">
-    SOLENNECLUB
-  </p>
-
-  <h2 className="font-serif text-[52px] font-light leading-[0.96] tracking-[-0.04em] text-white md:text-[82px]">
-    The Sock
-  </h2>
-
-  <h3 className="mt-7 max-w-[540px] font-serif text-[30px] font-light leading-[1.16] tracking-[-0.035em] text-white md:text-[46px]">
-    A quiet object,
-    <br />
-    <span className="italic">before it becomes yours.</span>
-  </h3>
-
-  <p className="mt-6 max-w-[520px] font-sans text-[14px] font-light leading-7 text-white/64">
-    A daily layer of comfort, designed to be felt before it is seen.
-  </p>
-</div>
-
-            <div className="mt-7 grid grid-cols-2 gap-x-10 gap-y-5 border-y border-white/10 py-6">
-              <div>
-                <p className="mb-2 font-sans text-[9px] uppercase tracking-[0.34em] text-white/35">
-                  Material
-                </p>
-                <p className="font-sans text-[13px] font-light leading-6 text-white/64">
-                  Cotton / Cashmere / Silk
-                </p>
-              </div>
-
-              <div>
-                <p className="mb-2 font-sans text-[9px] uppercase tracking-[0.34em] text-white/35">
-                  Origin
-                </p>
-                <p className="font-sans text-[13px] font-light leading-6 text-white/64">
-                  Designed in Germany
-                  <br />
-                  Made in Italy
-                </p>
-              </div>
-
-              <div>
-                <p className="mb-2 font-sans text-[9px] uppercase tracking-[0.34em] text-white/35">
-                  Availability
-                </p>
-                <p className="font-sans text-[13px] font-light leading-6 text-white/64">
-                  Limited release
-                </p>
-              </div>
-
-              <div>
-                <p className="mb-2 font-sans text-[9px] uppercase tracking-[0.34em] text-white/35">
-                  Price
-                </p>
-                <p className="font-sans text-[13px] font-light leading-6 text-white/64">
-                  €88
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <p className="mb-3 font-sans text-[9px] uppercase tracking-[0.34em] text-white/35">
-                Size
-              </p>
-
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  className="border border-white/50 px-5 py-3.5 font-sans text-[11px] font-light uppercase tracking-[0.24em] text-white transition duration-300 hover:border-white hover:bg-white hover:text-black"
-                >
-                  EU 36–40
-                </button>
-
-                <button
-                  type="button"
-                  className="border border-white/18 px-5 py-3.5 font-sans text-[11px] font-light uppercase tracking-[0.24em] text-white/58 transition duration-300 hover:border-white/50 hover:text-white"
-                >
-                  EU 41–45
-                </button>
-              </div>
-            </div>
-
-            <button className="mt-6 w-full border border-white/70 px-8 py-4 font-sans text-[11px] font-medium uppercase tracking-[0.34em] text-white transition duration-300 hover:bg-white hover:text-black">
-              ADD TO BAG →
-            </button>
-
-            <p className="mt-4 text-center font-sans text-[11px] font-light text-white/42">
-              Launch quantity will be limited.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-            const imageLeft = scene.imageSide === "left";
-
-            return (
-              <div
-                key={`scene-${index}`}
-                className="absolute inset-0 flex items-center justify-center px-8"
-                style={{
-                  opacity,
-                  transform: `translateY(${30 - local * 60}px)`,
-                  pointerEvents: opacity > 0.2 ? "auto" : "none",
-                }}
-              >
-                <div
-                  className={`grid w-full max-w-[1180px] items-center gap-12 md:grid-cols-[0.9fr_1.1fr] ${
-                    imageLeft ? "md:[&>div:first-child]:order-2" : ""
-                  }`}
-                >
-                  <div className="relative min-h-[62vh] overflow-hidden bg-[#120F0C]">
-                    {scene.image && (
-                      <Image
-                        src={scene.image}
-                        alt={scene.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover opacity-90"
-                        style={{
-                          transform: `scale(${1.04 - local * 0.02})`,
-                          transition: "transform 120ms linear",
-                        }}
-                      />
-                    )}
-
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
-
-                    <p className="absolute bottom-8 left-8 font-sans text-[10px] font-light uppercase tracking-[0.4em] text-white/40">
-                      SC / OBJ / 00{index}
-                    </p>
-                  </div>
-
-                  <div
-                    className={`${
-                      imageLeft ? "md:pr-10" : "md:pl-10"
-                    } text-left`}
-                  >
-                    <p className="mb-8 font-sans text-[10px] font-light uppercase tracking-[0.45em] text-white/42">
-                      {scene.eyebrow}
-                    </p>
-
-                    <h2 className="font-serif text-[48px] font-light leading-[0.98] tracking-[-0.055em] text-white md:text-[82px] lg:text-[112px]">
-                      {scene.title}
-                      {scene.italic && (
-                        <>
-                          <br />
-                          <span className="italic">{scene.italic}</span>
-                        </>
-                      )}
-                    </h2>
-
-                    <p className="mt-8 max-w-[560px] font-sans text-[14px] font-light leading-8 text-white/60">
-                      {scene.text}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
-          <p className="absolute bottom-8 left-8 font-sans text-[10px] font-light uppercase tracking-[0.42em] text-white/32">
-            THE SOCK / 001
-          </p>
-
-          <p className="absolute bottom-8 right-8 font-sans text-[10px] font-light uppercase tracking-[0.42em] text-white/32">
-            SOLENNECLUB
-          </p>
         </div>
       </section>
-
-      <style>{`
-.scrollChevron {
-  position: absolute;
-  bottom: 20vh;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  opacity: 0.72;
-  pointer-events: none;
-}
-
-.scrollChevron span {
-  display: block;
-  width: 18px;
-  height: 18px;
-  margin-top: -7px;
-  border-right: 1px solid rgba(0, 0, 0, 0.42);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.42);
-  transform: rotate(45deg);
-  animation: solenneChevron 1.55s ease-in-out infinite;
-}
-.productGallery {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.productGallery::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollChevron span:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.scrollChevron span:nth-child(2) {
-  animation-delay: 0.16s;
-}
-
-.scrollChevron span:nth-child(3) {
-  animation-delay: 0.32s;
-}
-
-@keyframes solenneChevron {
-  0% {
-    opacity: 0.08;
-    transform: translateY(-6px) rotate(45deg);
-  }
-
-  35% {
-    opacity: 0.78;
-  }
-
-  70% {
-    opacity: 0.26;
-    transform: translateY(8px) rotate(45deg);
-  }
-
-  100% {
-    opacity: 0.08;
-    transform: translateY(13px) rotate(45deg);
-  }
-}
-        body.solenne-immersive-active header,
-        body.solenne-immersive-active .site-header,
-        body.solenne-immersive-active .announcement-bar {
-          opacity: 0;
-          transform: translateY(-120%);
-          pointer-events: none;
-          transition: opacity 0.45s ease, transform 0.45s ease;
-        }
-
-        body.solenne-immersive-active {
-          background: #343229;
-        }
-      `}</style>
     </main>
   );
 }

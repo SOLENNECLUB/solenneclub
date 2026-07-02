@@ -30,7 +30,7 @@ export default function AccountPage() {
             />
 
             <a
-  href="https://account.solenneclub.com"
+  href="https://account.solenneclub.com/orders"
   className="mt-4 flex h-14 w-full items-center justify-center border border-black/35 bg-transparent font-sans text-[11px] font-light uppercase tracking-[0.3em] text-black/72 transition duration-300 hover:border-black hover:bg-[#1A1918] hover:text-white"
 >
   Continue with email →

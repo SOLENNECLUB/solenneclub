@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import { useLanguage } from "@/components/language/LanguageProvider";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function HomePage() {
   const [isPhilosophyOpen, setIsPhilosophyOpen] = useState(false);
+const { language, t } = useLanguage();
 
   return (
     <div
@@ -17,40 +19,54 @@ export default function HomePage() {
   }}
 >
         {/* HERO */}
-        <section className="relative h-[520px] overflow-hidden">
-          <Image
-  src="/images/hero.jpg"
-            alt="Soft textile texture"
-            fill
-            priority
-            className="object-cover"
-          />
+        <section className="relative h-[560px] overflow-hidden">
+          <video
+  className="absolute inset-0 z-0 h-full w-full object-cover object-[center_62%]"
+  autoPlay
+  muted
+  loop
+  playsInline
+  preload="auto"
+  poster="/images/hero.jpg"
+>
+  <source src="/videos/walking-well.mp4" type="video/mp4" />
+</video>
 
-          <div className="absolute inset-0 bg-black/35" />
+<div className="absolute inset-0 bg-black/35" />
+<div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/35" />
 
           <div className="absolute inset-0 flex items-center justify-center text-center text-white">
             <div>
-              <p className="mb-4 font-sans text-[10px] font-light uppercase tracking-[0.35em] text-white/75">
-                Established 2024
-              </p>
-
-              <h1 className="font-serif text-[52px] font-light leading-[0.88] tracking-[-0.04em] md:text-[74px] lg:text-[92px]">
-                The Art of
-                <br />
-                <span className="italic">Walking Well</span>
+              <p className="mb-4 w-full translate-x-[-25px] text-center font-sans text-[10px] font-light uppercase tracking-[0.35em] text-white/75">
+  {t.home.established}
+</p>
+              <h1 className="font-serif text-[52px] font-light leading-[0.96] tracking-[-0.04em] md:text-[74px] md:leading-[0.94] lg:text-[92px]">
+                {language === "de" ? (
+  <span className="block whitespace-nowrap text-[42px] md:text-[74px] lg:text-[92px]">
+    {t.home.heroTitleOne} {t.home.heroTitleTwo}
+  </span>
+) : (
+  <>
+    {t.home.heroTitleOne}
+    <br />
+    <span className="italic">{t.home.heroTitleTwo}</span>
+  </>
+)}
               </h1>
 
-              <p className="mx-auto mt-6 max-w-[520px] text-[15px] leading-8 text-white/85">
-                A quiet luxury brand grounded in comfort,
-                ritual, and the beauty of everyday life.
-              </p>
+              <div className="mx-auto mt-8 flex w-full max-w-[680px] flex-col items-center justify-center text-center">
+  <p className="w-full text-center text-[15px] leading-10 text-white/85">
+    {t.home.heroText}
+  </p>
 
-              <Link
-                href="/shop"
-                className="mt-8 inline-flex items-center gap-5 border border-white/60 px-10 py-4 font-sans text-[10px] font-light uppercase tracking-[0.24em] transition hover:bg-white hover:text-black"
-              >
-                Discover The Ritual <span>→</span>
-              </Link>
+  <Link
+  href="/shop"
+  className="mt-3 inline-flex h-[40px] min-w-[250px] items-center justify-center gap-6 border border-white/60 px-6 font-sans text-[10px] font-light uppercase leading-none tracking-[0.24em] text-white transition hover:bg-white hover:text-black"
+>
+  <span className="leading-none">{t.home.heroCta}</span>
+  <span className="text-[15px] leading-none">→</span>
+</Link>
+</div>
             </div>
           </div>
 </section>
@@ -81,22 +97,14 @@ export default function HomePage() {
       : "opacity-100"
   }`}
 >
-    <h2 className="mx-auto max-w-[380px] -translate-y-2 font-serif text-[24px] font-light leading-[1.08] tracking-[-0.02em] text-[#1A1918] md:text-[28px]">
-      “We believe that luxury
-      <br />
-      is not about noise,
-      <br />
-      but about <span className="italic">silence.</span>”
-    </h2>
+    <h2 className="mx-auto max-w-[420px] -translate-y-2 font-serif text-[24px] font-light leading-[1.08] tracking-[-0.02em] text-[#1A1918] md:text-[28px]">
+  “{t.home.quote}”
+</h2>
 
     <div className="mt-5 mb-8 h-px w-12 bg-black/30" />
 
-    <p className="mx-auto max-w-[310px] translate-y-1 font-sans text-[12px] font-medium leading-5 text-black/65">
-  In a world that moves too fast,
-  <br />
-  we create objects that slow you down.
-  <br />
-  To feel. To breathe. To walk well.
+    <p className="mx-auto max-w-[330px] translate-y-1 font-sans text-[12px] font-medium leading-5 text-black/65">
+  {t.home.quoteBody}
 </p>
   </div>
 
@@ -106,7 +114,9 @@ export default function HomePage() {
   onClick={() => setIsPhilosophyOpen((current) => !current)}
   className="border-b border-black/50 pb-1 font-sans text-[11px] font-medium uppercase tracking-[0.22em] text-black/65 transition duration-300 hover:border-black hover:text-black"
 >
-  {isPhilosophyOpen ? "Close Philosophy ↑" : "Read Our Philosophy →"}
+  {isPhilosophyOpen
+  ? `${t.home.philosophyClose} ↑`
+  : `${t.home.philosophyCta} →`}
 </button>
   </div>
 </section>
@@ -211,28 +221,28 @@ export default function HomePage() {
   }}
 >
     {[
-      {
-        label: "The Collection",
-        title: "One object.\nMany moments.",
-        cta: "Explore",
-        href: "/shop",
-        image: "/images/collection.jpg",
-      },
-      {
-        label: "The Journal",
-        title: "Thoughts on\nslow living.",
-        cta: "Read Essays",
-        href: "/journal",
-        image: "/images/journal.jpg",
-      },
-      {
-        label: "Materials",
-        title: "The beauty of\nnatural fibers.",
-        cta: "Learn More",
-        href: "/materials",
-        image: "/images/materials.jpg",
-      },
-    ].map((card) => (
+  {
+    label: t.home.cards.materials.label,
+    title: t.home.cards.materials.title,
+    cta: t.home.cards.materials.cta,
+    href: "/materials",
+    image: "/images/collection.jpg",
+  },
+  {
+    label: t.home.cards.journal.label,
+    title: t.home.cards.journal.title,
+    cta: t.home.cards.journal.cta,
+    href: "/journal",
+    image: "/images/journal.jpg",
+  },
+  {
+    label: t.home.cards.collection.label,
+    title: t.home.cards.collection.title,
+    cta: t.home.cards.collection.cta,
+    href: "/shop",
+    image: "/images/materials.jpg",
+  },
+].map((card) => (
       <Link
         key={card.label}
         href={card.href}
